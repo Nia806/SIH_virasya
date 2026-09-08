@@ -1,24 +1,24 @@
-# Virasya — AI-Powered Heritage Marketplace
+# Virasya `—` AI-Powered Heritage Marketplace
 
-> **Smart Cataloging & Market Linkage for Marginalized Artisans** · [virasya.vercel.app](https://virasya.vercel.app/) · SIH 2025
+> **Smart Cataloging & Market Linkage for Marginalized Artisans** · [virasya.vercel.app](https://virasya.vercel.app/)
 
-An AI-driven web platform that acts as a *virtual business manager* for Indian artisans — automating product photography analysis, listing generation, pricing, multilingual content, and social media marketing. Built with Next.js 15, Firebase, and Google Genkit (Gemini 2.5 Flash).
+An AI-driven web platform that acts as a *virtual business manager* for Indian artisans. It automates product photography analysis, listing generation, pricing, multilingual content, and social media marketing.
 
 ---
 
 ## The Problem
 
-India has millions of skilled artisans and micro-entrepreneurs supported through government schemes, Shilp Samagams, and trade fairs like Surajkund Mela and Dilli Haat. These events provide a temporary boost — but artisans have **no continuous, year-round digital channel**.
+India has millions of skilled artisans and micro-entrepreneurs supported through government schemes, Shilp Samagams, and trade fairs like Surajkund Mela and Dilli Haat. These events provide a temporary boost, but artisans have **no continuous, year-round digital channel**.
 
 Three barriers block their transition to e-commerce:
 
-- **No digital presence** — artisans lack the tools and knowledge to photograph, describe, and price products professionally for online platforms.
-- **Low market reach** — crafts stay confined to local or seasonal fairs, with no access to national or global buyers.
-- **Cultural erosion** — without sustainable income, many traditional art forms face decline and disappearance.
+- **No digital presence:** artisans lack the tools and knowledge to photograph, describe, and price products professionally for online platforms.
+- **Low market reach:** crafts stay confined to local or seasonal fairs, with no access to national or global buyers.
+- **Cultural erosion:** without sustainable income, many traditional art forms face decline and disappearance.
 
 ## The Solution
 
-Virasya bridges traditional craftsmanship and modern digital commerce. Upload a photo — the AI does the rest.
+Virasya bridges traditional craftsmanship and modern digital commerce. Upload a photo and the AI does the rest.
 
 ```mermaid
 flowchart LR
@@ -249,7 +249,7 @@ erDiagram
 | `/users/{userId}/browsingHistory` | Owner only                                     | Owner only (path-scoped)            |
 | `/users/{userId}/recommendations` | Owner only                                     | Owner only (path-scoped)            |
 
-> **`artisanId` is immutable** — update rules enforce `request.resource.data.artisanId == resource.data.artisanId`.
+> **`artisanId` is immutable.** Update rules enforce `request.resource.data.artisanId == resource.data.artisanId`.
 
 ---
 
@@ -316,7 +316,7 @@ npm run dev        # Next.js on http://localhost:9002
 
 ## Genkit Dev UI
 
-The Genkit Developer UI lets you inspect, test, and trace every AI flow in isolation — without touching the Next.js app. Useful when iterating on prompts or debugging AI outputs.
+The Genkit Developer UI lets you inspect, test, and trace every AI flow in isolation, without touching the Next.js app. Useful when iterating on prompts or debugging AI outputs.
 
 ```bash
 npm run genkit:dev      # Start Genkit UI (loads .env via dotenv)
@@ -332,7 +332,7 @@ This runs `src/ai/dev.ts` which imports all 8 flows. The Genkit UI opens at **`h
 
 **To add a new Genkit flow:**
 
-1. Create `src/ai/flows/your-new-flow.ts` — define input/output Zod schemas, a prompt, and a flow.
+1. Create `src/ai/flows/your-new-flow.ts` with input/output Zod schemas, a prompt, and a flow.
 2. Import it in `src/ai/dev.ts` so the Dev UI registers it.
 3. Export the callable function; mark the file `'use server'` for Next.js Server Actions.
 
@@ -343,7 +343,7 @@ This runs `src/ai/dev.ts` which imports all 8 flows. The Genkit UI opens at **`h
 ### Vercel (Recommended)
 
 1. Push to GitHub
-2. Import repo in [Vercel](https://vercel.com) — auto-detects Next.js
+2. Import repo in [Vercel](https://vercel.com) (auto-detects Next.js)
 3. Add environment variable: `GEMINI_API_KEY`
 4. Deploy Firestore rules separately via Firebase CLI
 
@@ -359,15 +359,15 @@ firebase deploy --only hosting
 
 ## Key Extension Points
 
-| Want to...                     | Where to look                                                                                   |
-| ------------------------------ | ----------------------------------------------------------------------------------------------- |
-| Add a new AI capability        | New file in`src/ai/flows/`, import in `dev.ts`, call via Server Action                      |
-| Change the AI model            | `src/ai/genkit.ts` — swap `model: 'googleai/gemini-2.5-flash'`                             |
-| Add a new Firestore collection | Add rules to`firestore.rules`, create hooks using `useCollection`/`useDoc`                |
-| Add a new user role            | Extend`role` in `userProfiles`, add route guards in `app/`                                |
-| Support more languages         | Extend the`targetLanguage` enum in `translate-content-flow.ts`                              |
-| Replace Firestore              | Swap`src/firebase/firestore/` hooks — rest of app uses the hook interface                    |
-| Enable Genkit streaming        | Flows support`streamingCallback` — see [Genkit docs](https://firebase.google.com/docs/genkit) |
+| Want to...                     | Where to look                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
+| Add a new AI capability        | New file in`src/ai/flows/`, import in `dev.ts`, call via Server Action                    |
+| Change the AI model            | `src/ai/genkit.ts`, swap `model: 'googleai/gemini-2.5-flash'`                             |
+| Add a new Firestore collection | Add rules to`firestore.rules`, create hooks using `useCollection`/`useDoc`              |
+| Add a new user role            | Extend`role` in `userProfiles`, add route guards in `app/`                              |
+| Support more languages         | Extend the`targetLanguage` enum in `translate-content-flow.ts`                            |
+| Replace Firestore              | Swap`src/firebase/firestore/` hooks (rest of app uses the hook interface)                   |
+| Enable Genkit streaming        | Flows support`streamingCallback`, see [Genkit docs](https://firebase.google.com/docs/genkit) |
 
 ---
 
@@ -375,9 +375,9 @@ firebase deploy --only hosting
 
 Deep-dives in `docs/`:
 
-- `DATABASE.md` — Firestore schema details & real-time sync pattern
-- `AI_INTEGRATIONS.md` — Genkit flow philosophy & implementation notes
-- `DESIGN.md` — Artisan-focused design language & color tokens
-- `DEPLOYMENT.md` — Hosting alternatives & environment setup
-- `INTEGRATIONS.md` — Third-party integration notes
-- `blueprint.md` — Original feature blueprint
+- `DATABASE.md`- Firestore schema details and real-time sync pattern
+- `AI_INTEGRATIONS.md`- Genkit flow philosophy and implementation notes
+- `DESIGN.md` Artisan-focused design language and color tokens
+- `DEPLOYMENT.md`: Hosting alternatives and environment setup
+- `INTEGRATIONS.md`- Third-party integration notes
+- `blueprint.md`- Original feature blueprint
