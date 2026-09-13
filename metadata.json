@@ -1,0 +1,8 @@
+{
+  "name": "Virasya",
+  "description": "Where Heritage Craft Meets AI. Supporting artisans and preserving cultural authenticity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
