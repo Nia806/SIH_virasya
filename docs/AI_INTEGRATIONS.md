@@ -22,7 +22,17 @@ The AI in Virasya is powered by **Google Genkit** using the **Gemini 2.5 Flash**
 - **Capability**: Hindi, Tamil, Bengali, Marathi, English.
 - **Nuance**: It is instructed to keep cultural proper nouns intact (e.g., "Khurja" or "Madhubani") while translating the surrounding descriptive text.
 
+## 🎨 Client-Side AI Preprocessing (`src/components/ImageEnhancerStudio.tsx`)
+
+Before photos are passed to Genkit Vision flows, they go through the **AI Craft Studio Enhancer**:
+- **AI Background Removal**: Powered by `@imgly/background-removal` (in-browser ONNX/WASM AI segmentation, 100% free with zero API cost).
+- **Studio Formatting & 3D Drop-Shadow**: Centers craft on a 1:1 $2048 \times 2048$ studio canvas with customizable backdrops (Studio White, Warm Heritage, Cool Slate, Transparent PNG) and directional soft 3D drop-shadows.
+- **Studio Lighting & Color Tuning**: Auto/manual fine-tuning for **Studio Lighting (Brightness)**, **Contrast & Depth**, **Pigment Saturation**, and **Pixel Micro-Sharpness** (3x3 unsharp convolution matrix).
+- **HD Super-Sampling**: 1.5x bicubic resolution upscale for high-frequency detail enhancement.
+
+
 ## 🛠 Technical Implementation
-- **Server Actions**: Next.js Server Actions call the flows directly from the client.
-- **Streaming**: While not implemented in this prototype, Genkit supports streaming for long stories.
-- **API Key**: Requires `GEMINI_API_KEY` in your environment variables.
+- **Server Actions**: Next.js Server Actions call Genkit flows directly from the client.
+- **Streaming**: Genkit supports streaming for long stories.
+- **API Key**: Requires `GEMINI_API_KEY` in your environment variables for Genkit AI flows; image enhancement runs 100% in-browser for free.
+
