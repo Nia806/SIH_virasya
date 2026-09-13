@@ -25,6 +25,8 @@ import { addDocumentNonBlocking, setDocumentNonBlocking } from '@/firebase/non-b
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArtisanVoiceInput, INDIAN_LANGUAGES } from '@/components/ArtisanVoiceInput';
 import { ImageEnhancerStudio } from '@/components/ImageEnhancerStudio';
+import { PricingCard } from '@/components/PricingCard';
+import { ManualPriceAdvisorModal } from '@/components/ManualPriceAdvisorModal';
 
 const CRAFT_CATEGORIES = [
   'Pottery', 
@@ -86,6 +88,7 @@ function ProductUploadContent() {
   const [isMarketingLoading, setIsMarketingLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingDraft, setIsLoadingDraft] = useState(false);
+  const [isManualPricingModalOpen, setIsManualPricingModalOpen] = useState(false);
   
   const { toast } = useToast();
   const db = useFirestore();
@@ -422,9 +425,12 @@ function ProductUploadContent() {
         {/* Progress Dots / Bar */}
         <div className="flex items-center gap-2 mb-4">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div 
-              key={i} 
-              className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+            <button 
+              key={i}
+              type="button"
+              onClick={() => setStep(i)}
+              title={`Jump to Step ${i}`}
+              className={`h-2 flex-1 rounded-full transition-all duration-300 hover:opacity-80 cursor-pointer ${
                 step >= i ? 'bg-primary' : 'bg-secondary'
               }`} 
             />
@@ -782,19 +788,18 @@ function ProductUploadContent() {
               </label>
             </Card>
 
-            {/* Pricing Guidance Block */}
-            <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10">
-              <h3 className="font-headline font-bold text-primary mb-3 flex items-center gap-2">
-                <Sparkles className="h-4 w-4" /> AI Pricing Guidance
-              </h3>
-              <p className="text-2xl font-headline font-bold text-primary mb-2 flex items-baseline">
-                <span className="text-lg mr-1 font-sans">₹</span>
-                {details.priceRange.min} - {details.priceRange.max}
-              </p>
-              <p className="text-xs text-muted-foreground leading-relaxed italic">
-                &ldquo;{details.priceRange.reasoning}&rdquo;
-              </p>
-            </div>
+            {/* Dynamic Market Pricing Assistant Card */}
+            <PricingCard
+              craftType={details.category}
+              materials={details.materials}
+              region={details.region}
+              productTitle={details.title}
+              description={details.description}
+              selectedPrice={details.price}
+              onPriceChange={(newPrice) => setDetails(prev => ({ ...prev, price: newPrice }))}
+              onPriceRangeDetermined={(range) => setDetails(prev => ({ ...prev, priceRange: range }))}
+              onManualFallbackRequested={() => setIsManualPricingModalOpen(true)}
+            />
 
             {/* Marketing Generator CTA */}
             <Button 
@@ -937,13 +942,22 @@ function ProductUploadContent() {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-12">
+              <div className="flex flex-col sm:flex-row gap-4 pt-12">
                 <Button 
                   variant="outline" 
-                  className="flex-1 rounded-full h-14 border-2" 
+                  className="rounded-full h-14 border-2 px-6" 
                   onClick={() => setStep(1)}
                 >
                   Start Over
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  className="rounded-full h-14 px-6 font-semibold" 
+                  onClick={() => handleSave('Draft')}
+                  disabled={isSaving}
+                >
+                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Save Draft
                 </Button>
                 <Button 
                   className="flex-1 rounded-full h-14 shadow-lg text-lg gap-2" 
@@ -1008,9 +1022,17 @@ function ProductUploadContent() {
                   </div>
                 </div>
 
-                <div className="flex gap-4 pt-6">
+                <div className="flex flex-wrap gap-3 pt-6">
                   <Button variant="outline" className="flex-1 rounded-full h-12" onClick={() => setStep(5)}>
                     Back to Edit
+                  </Button>
+                  <Button 
+                    variant="secondary"
+                    className="flex-1 rounded-full h-12 font-semibold" 
+                    onClick={() => handleSave('Draft')} 
+                    disabled={isSaving}
+                  >
+                    Save as Draft
                   </Button>
                   <Button 
                     className="flex-1 rounded-full h-12 shadow-lg" 
@@ -1026,6 +1048,25 @@ function ProductUploadContent() {
           </div>
         </div>
       )}
+
+      {/* Manual Cost & Labor Advisor Fallback Modal */}
+      <ManualPriceAdvisorModal
+        isOpen={isManualPricingModalOpen}
+        onClose={() => setIsManualPricingModalOpen(false)}
+        craftCategory={details.category}
+        materialsUsed={details.materials}
+        onApplyPricing={(min, max, suggested, reasoning) => {
+          setDetails(prev => ({
+            ...prev,
+            price: suggested,
+            priceRange: { min, max, reasoning }
+          }));
+          toast({
+            title: "Manual Pricing Guidance Applied",
+            description: `Price set to ₹${suggested} (Range ₹${min} - ₹${max}).`,
+          });
+        }}
+      />
     </>
   );
 }
