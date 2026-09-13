@@ -375,6 +375,7 @@ firebase deploy --only hosting
 
 Deep-dives in `docs/`:
 
+- `AUTHENTICATION.md` - Role-based Firebase Auth, dual-tab sign in/up, and password recovery
 - `DATABASE.md`- Firestore schema details and real-time sync pattern
 - `AI_INTEGRATIONS.md`- Genkit flow philosophy and implementation notes
 - `DESIGN.md` Artisan-focused design language and color tokens
