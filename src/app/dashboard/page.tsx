@@ -32,6 +32,7 @@ export default function ArtisanDashboard() {
   const db = useFirestore();
   const [isMarketingLoading, setIsMarketingLoading] = useState(false);
   const [marketingResult, setMarketingResult] = useState<any>(null);
+  const [marketingProduct, setMarketingProduct] = useState<any>(null);
 
   const profileRef = useMemoFirebase(() => {
     if (!db || !user) return null;
@@ -77,6 +78,7 @@ export default function ArtisanDashboard() {
 
   const handleMarketingGen = async (product: any) => {
     setIsMarketingLoading(true);
+    setMarketingProduct(product);
     try {
       const result = await generateMarketingContent({
         productName: product.productName,
@@ -90,6 +92,21 @@ export default function ArtisanDashboard() {
     } finally {
       setIsMarketingLoading(false);
     }
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!marketingResult || !marketingProduct || typeof window === 'undefined') return;
+
+    const productUrl = `${window.location.origin}/product/${marketingProduct.id}`;
+    const message = [
+      marketingResult.whatsapp,
+      '',
+      `View this product: ${productUrl}`,
+      '',
+      marketingResult.hashtags.join(' '),
+    ].join('\n');
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleDelete = async (productId: string) => {
@@ -218,6 +235,10 @@ export default function ArtisanDashboard() {
                                 <div className="bg-secondary/20 p-6 rounded-3xl border border-primary/10">
                                   <h4 className="font-bold mb-2 text-primary uppercase tracking-widest text-xs">WhatsApp</h4>
                                   <p className="text-sm leading-relaxed">{marketingResult.whatsapp}</p>
+                                  <Button className="mt-4 rounded-full gap-2" onClick={handleWhatsAppShare}>
+                                    <Share2 className="h-4 w-4" />
+                                    Share on WhatsApp
+                                  </Button>
                                 </div>
                                 <div className="bg-primary/5 p-4 rounded-2xl">
                                   <p className="text-xs font-bold text-primary mb-1 uppercase tracking-widest">Promo Line</p>

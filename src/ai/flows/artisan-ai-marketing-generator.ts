@@ -16,7 +16,7 @@ const MarketingInputSchema = z.object({
 
 const MarketingOutputSchema = z.object({
   instagram: z.string().describe('Max 60 words.'),
-  whatsapp: z.string().describe('Max 25 words.'),
+  whatsapp: z.string().describe('Around 100 words.'),
   hashtags: z.array(z.string()).describe('8-10 tags.'),
   promoLine: z.string().describe('A catchy short line.'),
 });
@@ -38,7 +38,7 @@ Description: {{{description}}}
 
 Requirements:
 - Instagram caption: Max 60 words.
-- WhatsApp message: Max 25 words.
+- WhatsApp message: Around 100 words, written as a warm and complete product introduction that encourages people to view or buy the product.
 - Hashtags: 8-10 relevant tags.
 - Promo Line: A short, punchy one-liner.
 

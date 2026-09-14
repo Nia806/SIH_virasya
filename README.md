@@ -87,7 +87,7 @@ flowchart LR
 ```
 src/
 ├── ai/
-│   ├── genkit.ts              # Genkit instance (model: gemini-2.5-flash)
+│   ├── genkit.ts              # Genkit instance (model: gemini-3.6-flash)
 │   ├── dev.ts                 # Imports all flows for the Genkit Dev UI
 │   └── flows/                 # 8 Genkit flows — see AI Flows section below
 │
@@ -333,7 +333,7 @@ firebase deploy --only hosting
 | Want to...                     | Where to look                                                                                 |
 | ------------------------------ | --------------------------------------------------------------------------------------------- |
 | Add a new AI capability        | New file in`src/ai/flows/`, import in `dev.ts`, call via Server Action                    |
-| Change the AI model            | `src/ai/genkit.ts`, swap `model: 'googleai/gemini-2.5-flash'`                             |
+| Change the AI model            | `src/ai/genkit.ts`, swap `model: 'googleai/gemini-3.6-flash'`                             |
 | Add a new Firestore collection | Add rules to`firestore.rules`, create hooks using `useCollection`/`useDoc`              |
 | Add a new user role            | Extend`role` in `userProfiles`, add route guards in `app/`                              |
 | Support more languages         | Extend the`targetLanguage` enum in `translate-content-flow.ts`                            |
