@@ -255,62 +255,33 @@ erDiagram
 
 ## Local Setup
 
-### Prerequisites
+> 📘 **For a detailed, step-by-step local setup guide, see [LOCAL_SETUP.md](file:///c:/Users/DELL/Downloads/GITHUB%20PROJECTS/SIH_virasya/LOCAL_SETUP.md).**
 
-- Node.js 20+
-- A Firebase project ([console.firebase.google.com](https://console.firebase.google.com))
-- A Gemini API key ([aistudio.google.com](https://aistudio.google.com))
+### Quick Start
 
-### Steps
+1. **Clone & install**
+   ```bash
+   git clone https://github.com/archangel2006/SIH_virasya.git
+   cd SIH_virasya
+   npm install
+   ```
 
-**1. Clone & install**
+2. **Environment Variables**
+   Create a `.env` file at the root. **`GEMINI_API_KEY` is the only required variable for local development**:
+   ```env
+   GEMINI_API_KEY=your_google_ai_studio_key
+   ```
+   *(Firebase credentials come pre-configured with fallback development settings in `src/firebase/config.ts`).*
 
-```bash
-git clone https://github.com/archangel2006/SIH_virasya.git
-cd SIH_virasya
-npm install
-```
+3. **Run Web App**
+   ```bash
+   npm run dev        # Next.js web application
+   ```
 
-**2. Configure Firebase**
-
-In the [Firebase Console](https://console.firebase.google.com):
-
-- Enable **Authentication** → Google + Email/Password providers
-- Enable **Cloud Firestore** (start in Test Mode for dev)
-- Create a **Web App** → copy the config object
-
-Edit `src/firebase/config.ts` with your project's values:
-
-```ts
-export const firebaseConfig = {
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID",
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-};
-```
-
-**3. Environment variables**
-
-Create a `.env` file at the project root:
-
-```env
-GEMINI_API_KEY=your_google_ai_studio_key
-```
-
-**4. Deploy Firestore security rules**
-
-```bash
-# Using Firebase CLI
-firebase deploy --only firestore:rules
-```
-
-**5. Run**
-
-```bash
-npm run dev        # Next.js on http://localhost:9002
-```
+4. **Run Genkit Dev UI (Optional for AI Flow Testing)**
+   ```bash
+   npm run genkit:dev # Genkit AI Flow UI at http://localhost:4000
+   ```
 
 ---
 
