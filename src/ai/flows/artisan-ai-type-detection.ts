@@ -65,7 +65,23 @@ const artisanAITypeDetectionFlow = ai.defineFlow(
     outputSchema: ArtisanAITypeDetectionOutputSchema,
   },
   async input => {
-    const {output} = await detectionPrompt(input);
-    return output!;
+    try {
+      const {output} = await detectionPrompt(input);
+      if (output) return output;
+    } catch (err: any) {
+      console.warn('Genkit detectionPrompt failed, using fallback:', err?.message || err);
+    }
+    return {
+      craftType: 'Textiles' as const,
+      suggestedTitle: 'Handmade Artisan Heritage Craft',
+      suggestedMaterials: 'Traditional Handcrafted Materials',
+      craftStyle: 'Traditional Indian Craft',
+      description: 'An authentic handcrafted piece created with traditional artisanal techniques.',
+      craftStory: 'Generations of craft traditions have shaped this piece, honoring regional cultural heritage.',
+      pricing: {
+        suggestedMidpoint: 1800,
+        reasoning: 'Fair compensation reflecting artisan time, materials, and skilled handicraft.'
+      }
+    };
   }
 );
