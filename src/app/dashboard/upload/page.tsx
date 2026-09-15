@@ -454,8 +454,12 @@ function ProductUploadContent() {
 
     if (!db) return;
     setIsSaving(true);
-
     try {
+      const rawImages = images.length > 0 ? images : (primaryImage ? [primaryImage] : []);
+      const optimizedImages = await Promise.all(
+        rawImages.map((img: string) => ensureOptimizedDataUri(img, 900, 0.75))
+      );
+
       const productData: any = {
         artisanId: user.uid,
         artisanName: user.displayName || 'Authentic Artisan',
@@ -469,7 +473,7 @@ function ProductUploadContent() {
         materials: details.materials,
         price: Number(details.price),
         availableQuantity: Number(details.quantity),
-        images: images.length > 0 ? images : (primaryImage ? [primaryImage] : []),
+        images: optimizedImages,
         story: details.story,
         storyRegional: details.storyRegional || null,
         status: status,
