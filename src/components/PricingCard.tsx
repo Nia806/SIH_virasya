@@ -128,32 +128,33 @@ export function PricingCard({
   return (
     <Card className={`overflow-hidden border border-primary/20 bg-white shadow-sm rounded-3xl ${className}`}>
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 border-b border-primary/10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-primary/10 text-primary rounded-xl">
-              <TrendingUp className="h-5 w-5" />
+      <div className="bg-gradient-to-r from-amber-500/8 via-primary/5 to-transparent px-5 py-3.5 border-b border-border/50">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="h-8 w-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <TrendingUp className="h-4 w-4" />
             </div>
-            <div>
-              <h3 className="font-headline font-bold text-foreground text-base flex items-center gap-2">
-                Dynamic Market Pricing
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-headline font-bold text-foreground text-sm tracking-tight">
+                  Dynamic Market Pricing
+                </h3>
                 {data?.marketConfidence && (
-                  <Badge 
-                    variant="outline" 
-                    className={`text-[10px] uppercase font-bold py-0.5 px-2 rounded-full ${
+                  <span 
+                    className={`inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                       data.marketConfidence === 'High' 
-                        ? 'border-emerald-500/40 text-emerald-700 bg-emerald-50/50' 
+                        ? 'border-emerald-200 text-emerald-700 bg-emerald-50' 
                         : data.marketConfidence === 'Medium'
-                        ? 'border-blue-500/40 text-blue-700 bg-blue-50/50'
-                        : 'border-amber-500/40 text-amber-700 bg-amber-50/50'
+                        ? 'border-blue-200 text-blue-700 bg-blue-50'
+                        : 'border-amber-200 text-amber-700 bg-amber-50'
                     }`}
                   >
                     {data.marketConfidence} Confidence
-                  </Badge>
+                  </span>
                 )}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                Statistical price discovery powered by real Indian e-commerce listings.
+              </div>
+              <p className="text-[11px] text-muted-foreground truncate">
+                Real-time price discovery from authentic Indian handicraft listings
               </p>
             </div>
           </div>
@@ -163,10 +164,10 @@ export function PricingCard({
             size="sm"
             onClick={() => fetchDynamicPricing(true)}
             disabled={isLoading}
-            className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground"
+            className="h-8 w-8 p-0 rounded-full text-muted-foreground hover:text-foreground shrink-0"
             title="Refresh market data"
           >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-primary' : ''}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin text-primary' : ''}`} />
           </Button>
         </div>
       </div>
@@ -231,68 +232,63 @@ export function PricingCard({
         {/* Successful Market Data State */}
         {!isLoading && data?.success && data.recommendedMin !== undefined && data.recommendedMax !== undefined && (
           <>
-            {/* Primary Recommendation Badges */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Clean 2-Column KPI Summary */}
+            <div className="grid grid-cols-2 gap-3">
               {/* Range Card */}
-              <div className="p-4 rounded-2xl bg-secondary/20 border border-border/60">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                  Recommended Market Range
+              <div className="p-3.5 rounded-2xl bg-secondary/15 border border-border/50">
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">
+                  Market Range
                 </span>
-                <p className="text-2xl font-headline font-bold text-foreground mt-1 flex items-baseline">
-                  <span className="text-base font-sans mr-0.5">₹</span>
-                  {data.recommendedMin.toLocaleString('en-IN')}
-                  <span className="text-muted-foreground mx-1.5 text-base font-normal">—</span>
-                  <span className="text-base font-sans mr-0.5">₹</span>
-                  {data.recommendedMax.toLocaleString('en-IN')}
+                <p className="text-lg sm:text-xl font-headline font-bold text-foreground mt-1">
+                  ₹{data.recommendedMin.toLocaleString('en-IN')} – ₹{data.recommendedMax.toLocaleString('en-IN')}
                 </p>
-                <span className="text-[10px] text-muted-foreground block mt-1">
-                  25th to 75th percentile (middle 50% of market)
+                <span className="text-[10px] text-muted-foreground block mt-0.5">
+                  Middle 50% benchmark
                 </span>
               </div>
 
               {/* Suggested Midpoint Card */}
-              <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 relative">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-primary uppercase tracking-wider">
-                    Suggested Listing Price
-                  </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onPriceChange(data.suggestedListingPrice!)}
-                    className="h-6 px-2 text-[10px] font-bold text-primary hover:bg-primary/20 rounded-full"
-                  >
-                    Apply Midpoint
-                  </Button>
+              <div className="p-3.5 rounded-2xl bg-primary/8 border border-primary/20 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-semibold text-primary uppercase tracking-wider">
+                      Suggested Mid
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onPriceChange(data.suggestedListingPrice!)}
+                      className="text-[10px] font-bold text-primary hover:underline"
+                    >
+                      Use
+                    </button>
+                  </div>
+                  <p className="text-lg sm:text-xl font-headline font-bold text-primary mt-1">
+                    ₹{data.suggestedListingPrice?.toLocaleString('en-IN')}
+                  </p>
                 </div>
-                <p className="text-2xl font-headline font-bold text-primary mt-1 flex items-baseline">
-                  <span className="text-base font-sans mr-0.5">₹</span>
-                  {data.suggestedListingPrice?.toLocaleString('en-IN')}
-                </p>
-                <span className="text-[10px] text-primary/70 block mt-1">
-                  Market median based on {data.statistics?.finalResultCount || 0} comparable items
+                <span className="text-[10px] text-primary/70 block mt-0.5">
+                  Median benchmark
                 </span>
               </div>
             </div>
 
             {/* Artisan Price Adjustment Slider */}
-            <div className="p-5 rounded-2xl bg-white border border-border/70 shadow-xs space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="p-4 rounded-2xl bg-white border border-border/60 shadow-xs space-y-3.5">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
-                    <SlidersHorizontal className="h-3.5 w-3.5 text-primary" /> Your Final Listing Price
+                    <SlidersHorizontal className="h-3.5 w-3.5 text-primary" /> Final Selling Price
                   </Label>
-                  <p className="text-[11px] text-muted-foreground">
-                    Adjust to reflect your personal mastery, rare materials, or special detailing.
+                  <p className="text-[10px] text-muted-foreground">
+                    Reflect your personal labor, mastery, and materials
                   </p>
                 </div>
-                <div className="text-right">
-                  <span className="text-2xl font-headline font-extrabold text-primary font-sans">
+                <div className="text-right shrink-0">
+                  <span className="text-xl font-headline font-extrabold text-primary font-sans">
                     ₹{currentPrice.toLocaleString('en-IN')}
                   </span>
                   {positionBadge && (
-                    <span className={`block text-[10px] font-semibold px-2 py-0.5 rounded-full border mt-0.5 ${positionBadge.color}`}>
+                    <span className={`block text-[9px] font-semibold px-2 py-0.5 rounded-full border mt-0.5 ${positionBadge.color}`}>
                       {positionBadge.text}
                     </span>
                   )}
@@ -300,7 +296,7 @@ export function PricingCard({
               </div>
 
               {!isManualOverride ? (
-                <div className="space-y-2 pt-2">
+                <div className="space-y-1.5 pt-1">
                   <Slider
                     value={[currentPrice]}
                     min={minBound}
@@ -311,20 +307,20 @@ export function PricingCard({
                   />
                   <div className="flex justify-between text-[10px] text-muted-foreground font-mono">
                     <span>₹{minBound.toLocaleString('en-IN')}</span>
-                    <span className="text-primary font-semibold">Suggested: ₹{data.suggestedListingPrice?.toLocaleString('en-IN')}</span>
+                    <span className="text-primary font-medium">Fair: ₹{data.suggestedListingPrice?.toLocaleString('en-IN')}</span>
                     <span>₹{maxBound.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-2 pt-1">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₹</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs">₹</span>
                     <Input
                       type="number"
                       value={selectedPrice || ''}
                       onChange={(e) => onPriceChange(Number(e.target.value) || 0)}
                       placeholder="Enter custom selling price..."
-                      className="pl-7 h-10 rounded-xl font-bold font-sans text-foreground"
+                      className="pl-7 h-9 rounded-xl font-bold font-sans text-foreground text-xs"
                     />
                   </div>
                   <Button
@@ -332,21 +328,21 @@ export function PricingCard({
                     variant="outline"
                     size="sm"
                     onClick={() => setIsManualOverride(false)}
-                    className="h-10 text-xs rounded-xl"
+                    className="h-9 text-xs rounded-xl px-3"
                   >
-                    Back to Slider
+                    Slider
                   </Button>
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-1 border-t border-border/40 text-[11px]">
+              <div className="flex items-center justify-between pt-2 border-t border-border/30 text-[10px]">
                 <button
                   type="button"
                   onClick={() => setIsManualOverride(!isManualOverride)}
                   className="text-primary hover:underline font-semibold flex items-center gap-1"
                 >
                   <Edit3 className="h-3 w-3" />
-                  {isManualOverride ? "Use slider adjustment" : "Set my own price manually"}
+                  {isManualOverride ? "Use interactive slider" : "Type price directly"}
                 </button>
 
                 {onManualFallbackRequested && (
@@ -355,158 +351,119 @@ export function PricingCard({
                     onClick={onManualFallbackRequested}
                     className="text-muted-foreground hover:text-foreground underline"
                   >
-                    Calculate with manual cost formula
+                    Cost-based formula
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Interpretable Reasoning Accordion */}
+            {/* Reasoning Accordion */}
             {data.reasoning && (
-              <div className="p-4 rounded-2xl bg-secondary/15 border border-border/60 space-y-2">
-                <div 
-                  className="flex items-center justify-between cursor-pointer"
+              <div className="rounded-2xl bg-secondary/10 border border-border/50 overflow-hidden">
+                <button
+                  type="button" 
+                  className="w-full px-3.5 py-2.5 flex items-center justify-between text-left hover:bg-secondary/20 transition-colors"
                   onClick={() => setShowReasoningDetails(!showReasoningDetails)}
                 >
-                  <div className="flex items-center gap-2">
-                    <Info className="h-4 w-4 text-primary" />
-                    <span className="text-xs font-bold text-foreground">Why this pricing recommendation?</span>
-                  </div>
-                  <button type="button" className="text-muted-foreground">
-                    {showReasoningDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </button>
-                </div>
+                  <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Info className="h-3.5 w-3.5 text-primary" /> Why this price recommendation?
+                  </span>
+                  {showReasoningDetails ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
+                </button>
 
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {data.reasoning.summary}
-                </p>
+                <div className="px-3.5 pb-3 pt-1 border-t border-border/30">
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    {data.reasoning.summary}
+                  </p>
 
-                {showReasoningDetails && (
-                  <div className="pt-3 border-t border-border/40 space-y-4">
-                    {/* Feature Importance Section */}
-                    {data.reasoning.featureImportance && data.reasoning.featureImportance.length > 0 && (
-                      <div className="space-y-2.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
-                            <Sparkles className="h-3.5 w-3.5 text-primary" /> Feature Importance & Pricing Drivers
+                  {showReasoningDetails && (
+                    <div className="mt-3 pt-2.5 border-t border-border/30 space-y-2.5 animate-in fade-in-50 duration-150">
+                      {/* Key Value Drivers */}
+                      {data.reasoning.featureImportance && data.reasoning.featureImportance.length > 0 && (
+                        <div className="space-y-1.5">
+                          <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider block">
+                            Key Value Drivers
                           </span>
-                          <span className="text-[10px] text-muted-foreground font-mono">Relative Contribution</span>
-                        </div>
-
-                        <div className="space-y-2">
-                          {data.reasoning.featureImportance.map((fi, idx) => (
-                            <div key={idx} className="p-2.5 rounded-xl bg-white border border-border/50 space-y-1.5">
-                              <div className="flex items-center justify-between text-xs">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-bold text-foreground">{fi.feature}</span>
-                                  <Badge variant="outline" className="text-[9px] py-0 px-1.5 border-primary/20 text-primary">
-                                    {fi.direction}
-                                  </Badge>
+                          <div className="space-y-1.5">
+                            {data.reasoning.featureImportance.map((fi, idx) => (
+                              <div key={idx} className="p-2 rounded-xl bg-white/80 border border-border/40 text-[10px] space-y-1">
+                                <div className="flex justify-between items-center">
+                                  <span className="font-semibold text-foreground">{fi.feature}</span>
+                                  <span className="font-mono text-primary font-bold">{fi.weightPercentage}%</span>
                                 </div>
-                                <span className="font-mono font-bold text-primary">{fi.weightPercentage}%</span>
+                                <div className="w-full bg-secondary/30 h-1 rounded-full overflow-hidden">
+                                  <div 
+                                    className="bg-primary h-full rounded-full" 
+                                    style={{ width: `${fi.weightPercentage}%` }} 
+                                  />
+                                </div>
+                                <span className="text-[9px] text-muted-foreground block">{fi.insight}</span>
                               </div>
-                              
-                              {/* Progress bar representing feature importance */}
-                              <div className="h-1.5 w-full bg-secondary/50 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-500" 
-                                  style={{ width: `${fi.weightPercentage}%` }}
-                                />
-                              </div>
-
-                              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                {fi.insight}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Statistical Factors Matrix */}
-                    <div className="pt-2 border-t border-border/30">
-                      <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block mb-2">
-                        Market Evidence Metrics
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {data.reasoning.factors.map((factor, idx) => (
-                          <div key={idx} className="p-2 rounded-xl bg-white/80 border border-border/40 text-xs">
-                            <span className="text-muted-foreground text-[10px] block uppercase font-semibold">
-                              {factor.factor}
-                            </span>
-                            <span className="font-bold text-foreground text-xs">
-                              {factor.value}
-                            </span>
-                            {factor.contribution && (
-                              <span className="text-[10px] text-primary block mt-0.5">
-                                {factor.contribution}
-                              </span>
-                            )}
+                            ))}
                           </div>
-                        ))}
+                        </div>
+                      )}
+
+                      <div className="text-[9px] text-muted-foreground pt-1 flex items-center gap-1">
+                        <ShieldCheck className="h-3 w-3 text-emerald-600 shrink-0" />
+                        <span>Statistical corridor with IQR outlier filtering across verified benchmarks.</span>
                       </div>
                     </div>
-
-                    <div className="text-[10px] text-muted-foreground pt-1 flex items-center gap-1">
-                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      <span>
-                        Robust statistical model: 1.5×IQR outlier exclusion ({data.statistics?.outlierCount || 0} excluded) across {data.statistics?.pricedResultCount || 0} live market observations.
-                      </span>
-                    </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 
             {/* Sources / Comparable Listings Accordion */}
             {data.sources && data.sources.length > 0 && (
-              <div className="space-y-2">
-                <Button
+              <div className="rounded-2xl bg-secondary/10 border border-border/50 overflow-hidden">
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
                   onClick={() => setShowSources(!showSources)}
-                  className="w-full justify-between h-9 text-xs text-muted-foreground hover:text-foreground rounded-xl bg-secondary/10 px-3"
+                  className="w-full px-3.5 py-2.5 flex items-center justify-between text-left hover:bg-secondary/20 transition-colors"
                 >
-                  <span className="flex items-center gap-1.5 font-semibold">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
                     <Layers className="h-3.5 w-3.5 text-primary" />
-                    Inspect {data.sources.length} Verified Comparable Listings
+                    Comparable Listings ({data.sources.length})
                   </span>
-                  {showSources ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                </Button>
+                  {showSources ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground" /> : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />}
+                </button>
 
                 {showSources && (
-                  <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                  <div className="p-2 space-y-1.5 max-h-56 overflow-y-auto border-t border-border/30">
                     {data.sources.map((item, idx) => (
                       <div 
                         key={idx} 
-                        className="p-2.5 rounded-xl bg-white border border-border/60 flex items-center justify-between text-xs gap-3"
+                        className="p-2 rounded-xl bg-white border border-border/50 flex items-center justify-between text-xs gap-2 hover:border-primary/30 transition-colors"
                       >
-                        <div className="flex items-center gap-3 overflow-hidden">
+                        <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
                           {item.thumbnail ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img 
                               src={item.thumbnail} 
                               alt="" 
-                              className="w-9 h-9 rounded-lg object-cover bg-secondary/30 shrink-0" 
+                              className="w-8 h-8 rounded-lg object-cover bg-secondary/20 shrink-0"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
                             />
                           ) : (
-                            <div className="w-9 h-9 rounded-lg bg-secondary/40 shrink-0 flex items-center justify-center text-[10px] font-bold text-muted-foreground">
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 shrink-0 flex items-center justify-center text-[10px] font-bold text-primary">
                               ₹
                             </div>
                           )}
-                          <div className="overflow-hidden">
-                            <p className="font-medium text-foreground truncate max-w-xs" title={item.title}>
+                          <div className="overflow-hidden min-w-0">
+                            <p className="font-medium text-foreground truncate text-[11px]" title={item.title}>
                               {item.title}
                             </p>
-                            <span className="text-[10px] text-muted-foreground">
-                              {item.source} • Score: {item.relevanceScore}/11
+                            <span className="text-[9px] text-muted-foreground block truncate">
+                              {item.source}
                             </span>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="font-bold text-primary font-sans">
+                        <div className="flex items-center gap-1.5 shrink-0 pl-1">
+                          <span className="font-bold text-primary font-sans text-xs">
                             ₹{item.extractedPrice.toLocaleString('en-IN')}
                           </span>
                           {item.link && (
@@ -514,10 +471,10 @@ export function PricingCard({
                               href={item.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-muted-foreground hover:text-primary p-1"
+                              className="text-muted-foreground hover:text-primary p-0.5"
                               title="View listing"
                             >
-                              <ExternalLink className="h-3.5 w-3.5" />
+                              <ExternalLink className="h-3 w-3" />
                             </a>
                           )}
                         </div>

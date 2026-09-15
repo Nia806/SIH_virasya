@@ -115,6 +115,20 @@ const TITLE_STOP_WORDS = new Set([
 ]);
 
 /**
+ * Craft-specific search query templates that produce finished-product results,
+ * not tools, raw materials, or unrelated items.
+ */
+const CRAFT_QUERY_TEMPLATES: Record<string, string[]> = {
+  woodwork: ['wooden decor india', 'handcrafted wooden home decor India', 'hand carved wooden sculpture India'],
+  pottery: ['terracotta pottery india', 'handmade clay pot india', 'ceramic decorative pot india'],
+  textiles: ['handloom fabric india', 'handwoven textile craft india'],
+  jewelry: ['handcrafted silver jewelry india', 'traditional jewelry handicraft india'],
+  metalwork: ['brass decor india', 'brass metal handicraft india', 'dhokra metal craft india'],
+  'hand painting': ['madhubani painting india', 'pattachitra handpainted art india'],
+  leatherwork: ['handcrafted leather craft india', 'mojari leather artisan india'],
+};
+
+/**
  * Extracts the most specific product noun from the product title.
  * e.g., "Handmade Embroidered Cotton Dupatta" → "Dupatta"
  *       "Handmade Terracotta Decorative Pot"  → "Pot"
@@ -135,72 +149,82 @@ function extractProductNoun(title: string, craft: string, mat: string): string {
 
 /**
  * Builds progressive search queries from specific to general.
- * Query order: most specific → product-noun fallback → craft-only broadest.
- *
- * Key fix: secondary query uses Material + ProductNoun (e.g., "Cotton Dupatta")
- * instead of Material + CraftType (e.g., "Cotton Textiles"), ensuring results
- * match the actual finished product in the photo, not raw materials.
+ * Uses craft-specific templates to avoid pulling tools/raw materials.
  */
 export function buildSearchQueries(input: PricingInput): string[] {
-  const craft = cleanSearchTerm(input.craftType || '');
-  const mat = cleanSearchTerm(input.materials || '');
+  let craft = cleanSearchTerm(input.craftType || '');
+  let mat = cleanSearchTerm(input.materials || '');
   const title = cleanSearchTerm(input.productTitle || '');
+  const desc = cleanSearchTerm(input.description || '');
 
-  // Extract the product noun from the title (e.g., "Dupatta", "Pot", "Earrings")
-  const productNoun = extractProductNoun(title, craft, mat);
+  // If craft is 'Other' or empty, detect meaningful craft category from title & description
+  const combinedText = `${title} ${desc}`.toLowerCase();
+  if (!craft || craft.toLowerCase() === 'other') {
+    if (combinedText.includes('chikankari') || combinedText.includes('dupatta') || combinedText.includes('cotton') || combinedText.includes('saree') || combinedText.includes('textile') || combinedText.includes('embroider')) {
+      craft = 'Textiles';
+    } else if (combinedText.includes('pot') || combinedText.includes('clay') || combinedText.includes('terracotta') || combinedText.includes('ceramic')) {
+      craft = 'Pottery';
+    } else if (combinedText.includes('wood') || combinedText.includes('carv') || combinedText.includes('sheesham')) {
+      craft = 'Woodwork';
+    } else if (combinedText.includes('metal') || combinedText.includes('brass') || combinedText.includes('dhokra') || combinedText.includes('copper')) {
+      craft = 'Metalwork';
+    } else if (combinedText.includes('jewel') || combinedText.includes('bead') || combinedText.includes('silver') || combinedText.includes('kundan')) {
+      craft = 'Jewelry';
+    } else {
+      craft = 'Handicraft';
+    }
+  }
 
-  // Extract extra high-signal keywords from title
-  const titleWords = title
-    .split(' ')
-    .filter(w => w.length > 2)
-    .filter(w => !craft.toLowerCase().includes(w.toLowerCase()))
-    .filter(w => !mat.toLowerCase().includes(w.toLowerCase()))
-    .slice(0, 4)
-    .join(' ');
+  // Filter out generic boilerplate material terms
+  if (mat.toLowerCase().includes('handcrafted raw') || mat.toLowerCase().includes('natural handcrafted') || mat.toLowerCase() === 'handcrafted materials') {
+    if (combinedText.includes('cotton')) mat = 'Cotton';
+    else if (combinedText.includes('terracotta') || combinedText.includes('clay')) mat = 'Terracotta';
+    else if (combinedText.includes('silk')) mat = 'Silk';
+    else if (combinedText.includes('brass')) mat = 'Brass';
+    else if (combinedText.includes('wood') || combinedText.includes('sheesham')) mat = 'Sheesham Wood';
+    else mat = '';
+  }
+
+  // Extract the product noun from the title
+  let productNoun = extractProductNoun(title, craft, mat);
+  if (!productNoun) {
+    if (combinedText.includes('dupatta')) productNoun = 'Dupatta';
+    else if (combinedText.includes('pot')) productNoun = 'Pot';
+    else if (combinedText.includes('saree')) productNoun = 'Saree';
+    else if (combinedText.includes('statue') || combinedText.includes('idol')) productNoun = 'Idol';
+    else if (combinedText.includes('sculpture')) productNoun = 'Sculpture';
+    else if (combinedText.includes('showpiece') || combinedText.includes('decor')) productNoun = 'Showpiece';
+    else productNoun = 'Handicraft';
+  }
 
   const queries: string[] = [];
 
-  // 1. Most specific: Material + Craft + Title Keywords
-  //    e.g., "Cotton Textiles Embroidered Dupatta"
-  if (mat && craft && titleWords) {
-    queries.push(`${mat} ${craft} ${titleWords}`.trim());
-  } else if (title) {
-    queries.push(title);
+  // 1. Most specific: craft-specific template query for finished products
+  const craftKey = craft.toLowerCase();
+  const templates = CRAFT_QUERY_TEMPLATES[craftKey];
+  if (templates && templates.length > 0) {
+    // Use material + product noun within the template context
+    const matPart = mat ? `${mat} ` : '';
+    queries.push(`${matPart}${productNoun} handcrafted India`.trim());
+    queries.push(templates[0]); // reliable fallback template
+  } else {
+    // Generic: Material + ProductNoun
+    if (mat && productNoun && productNoun.toLowerCase() !== craft.toLowerCase()) {
+      queries.push(`${mat} ${productNoun} handcrafted India`.trim());
+    } else if (craft && productNoun) {
+      queries.push(`${craft} ${productNoun} handcrafted India`.trim());
+    } else if (title) {
+      queries.push(title);
+    }
+    queries.push(`handcrafted ${craft} India artisan`.trim());
   }
 
-  // 2. Material + Product Noun — KEY FIX
-  //    e.g., "Cotton Dupatta" instead of "Cotton Textiles"
-  //    This ensures results match the finished product, not the raw material.
-  if (mat && productNoun && productNoun.toLowerCase() !== craft.toLowerCase()) {
-    const q2 = `${mat} ${productNoun}`.trim();
-    if (!queries.includes(q2)) queries.push(q2);
-  }
-
-  // 3. Craft Type + Product Noun
-  //    e.g., "Textiles Dupatta" or "Pottery Pot"
-  if (craft && productNoun && productNoun.toLowerCase() !== craft.toLowerCase()) {
-    const q3 = `${craft} ${productNoun}`.trim();
-    if (!queries.includes(q3)) queries.push(q3);
-  }
-
-  // 4. Material + Craft Type (broad fallback)
-  //    e.g., "Cotton Textiles" — only used if the above queries fail
-  if (mat && craft) {
-    const q4 = `${mat} ${craft}`.trim();
-    if (!queries.includes(q4)) queries.push(q4);
-  }
-
-  // 5. Craft Type alone (broadest fallback)
-  if (craft) {
-    const q5 = craft.trim();
-    if (!queries.includes(q5)) queries.push(q5);
-  }
-
-  return queries.filter(q => q.length > 0);
+  // Limit to maximum 2 fast, highly targeted queries
+  return queries.slice(0, 2);
 }
 
 // ============================================================================
-// 2. CONTROLLED SYNONYM MAP & GENERIC STOP TERMS
+// 2. CONTROLLED SYNONYM MAP, GENERIC STOP TERMS & HARD EXCLUSIONS
 // ============================================================================
 
 const GENERIC_STOP_WORDS = new Set([
@@ -209,6 +233,49 @@ const GENERIC_STOP_WORDS = new Set([
   'gift', 'authentic', 'quality', 'piece', 'item', 'design', 'style', 'new',
   'sale', 'price', 'original', 'custom', 'home', 'decor', 'for'
 ]);
+
+/**
+ * Hard-exclusion keyword patterns per craft category.
+ * If any exclusion word is found in a listing title, the listing is
+ * immediately rejected BEFORE relevance scoring — this removes tools,
+ * raw materials, accessories and unrelated categories from the comparable set.
+ */
+const CRAFT_EXCLUSION_TERMS: Record<string, string[]> = {
+  woodwork: [
+    'chisel', 'chisels', 'comb', 'lumber', 'board', 'plank', 'strip', 'blank',
+    'pen blank', 'rod', 'ring', 'rings', 'dandiya', 'stick', 'sticks', 'tool',
+    'tools', 'gouge', 'lathe', 'whittling', 'carving block', 'laser cut',
+    'cutout', 'unfinished', 'raw wood', 'wood wool', 'sawdust', 'wood shaving',
+    'woodworking kit', 'diy wood', 'craft material', 'craft materials',
+  ],
+  pottery: [
+    'tool', 'tools', 'kiln', 'glaze', 'raw clay', 'clay powder', 'clay block',
+    'pottery wheel', 'mold', 'mould', 'sculpting tool',
+  ],
+  textiles: [
+    'thread', 'threads', 'needle', 'needles', 'loom', 'machine', 'kit',
+    'raw cotton', 'fabric dye', 'sewing kit',
+  ],
+  jewelry: [
+    'tool', 'tools', 'wire', 'clasp', 'finding', 'bead kit', 'raw bead',
+    'plier', 'crimping',
+  ],
+  metalwork: [
+    'tool', 'tools', 'raw brass', 'scrap metal', 'wire', 'sheet metal',
+    'metal powder', 'alloy',
+  ],
+};
+
+/**
+ * Checks if a listing title contains any hard-excluded keyword for a given craft type.
+ * Returns true if the listing should be REJECTED.
+ */
+function isHardExcluded(listingTitle: string, craftType: string): boolean {
+  const titleLower = listingTitle.toLowerCase();
+  const craftKey = craftType.toLowerCase();
+  const exclusions = CRAFT_EXCLUSION_TERMS[craftKey] || [];
+  return exclusions.some(term => titleLower.includes(term));
+}
 
 const SYNONYM_MAP: Record<string, string[]> = {
   pottery: ['pot', 'pots', 'terracotta', 'ceramic', 'earthenware', 'pottery', 'clay', 'planter', 'vase', 'matka', 'handi', 'kulhad'],
@@ -412,10 +479,12 @@ export function evaluateMarketConfidence(
   finalIQR: number,
   finalMedian: number
 ): 'High' | 'Medium' | 'Limited' {
-  if (finalCount >= 15 && finalMedian > 0 && finalIQR / finalMedian <= 0.85) {
+  // High: 12+ genuinely relevant listings with tight price spread
+  if (finalCount >= 12 && finalMedian > 0 && finalIQR / finalMedian <= 0.70) {
     return 'High';
   }
-  if (finalCount >= 8) {
+  // Medium: at least 6 relevant listings (previously 8, relaxed since we now filter harder)
+  if (finalCount >= 6) {
     return 'Medium';
   }
   return 'Limited';
@@ -502,7 +571,9 @@ export function generateInterpretableReasoning(
 // ============================================================================
 
 const MINIMUM_COMPARABLE_LISTINGS = 5;
-const RELEVANCE_THRESHOLD = 4;
+// Raised from 4 → 6 so that listings must match craft + material + title keywords
+// to pass through. Score 4 was letting tools (chisel, comb) pass via craft-word alone.
+const RELEVANCE_THRESHOLD = 6;
 
 export function processMarketListings(
   rawResults: RawShoppingItem[],
@@ -518,10 +589,12 @@ export function processMarketListings(
     }
   }
 
-  // Step 2: Relevance scoring (BEFORE IQR)
+  // Step 2: Hard exclusion + Relevance scoring (BEFORE IQR)
   const comparableListings: ComparableListing[] = [];
   for (const item of pricedItems) {
     const title = item.title || '';
+    // Hard exclusion: reject tools, raw materials, accessories for this craft type
+    if (isHardExcluded(title, input.craftType || '')) continue;
     const score = calculateRelevanceScore(title, input);
     if (score >= RELEVANCE_THRESHOLD) {
       comparableListings.push({
